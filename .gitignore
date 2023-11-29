@@ -1,9 +1,9 @@
 # dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+client/.env
+client/.env.development.local
+client/.env.test.local
+client/.env.production.local
+client/.env.local
 
 # Fresh build directory
-_fresh/
+client/_fresh/
