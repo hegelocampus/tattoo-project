@@ -5,5 +5,8 @@ client/.env.test.local
 client/.env.production.local
 client/.env.local
 
+server/.env
+
 # Fresh build directory
 client/_fresh/
+*.pem
