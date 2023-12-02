@@ -1,6 +1,5 @@
 import { Application } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 import router from "./routes.ts";
-import { load } from "https://deno.land/std@0.208.0/dotenv/mod.ts";
 
 // Setup server
 const app = new Application();
