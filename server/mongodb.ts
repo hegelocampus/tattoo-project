@@ -11,15 +11,12 @@ const password = encodeURIComponent(Deno.env.get("MONGODB_PASSWORD"));
 const clusterUrl = encodeURIComponent("cluster0.mc93mg6.mongodb.net");
 const url = `mongodb+srv://${username}:${password}@${clusterUrl}`;
 
-const client = new MongoClient(
-  url,
-  {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      deprecationErrors: true,
-    }
-  }
-);
+const client = new MongoClient(url, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    deprecationErrors: true,
+  },
+});
 
 const dbClient = client.db("testDB");
 

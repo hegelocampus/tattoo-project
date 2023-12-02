@@ -18,5 +18,3 @@ app.use(async (ctx, next) => {
 
 app.listen({ port: PORT });
 console.log(`Server listening on port ${PORT}`);
-
-

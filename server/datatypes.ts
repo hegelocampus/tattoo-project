@@ -1,4 +1,3 @@
-
 export interface Flash {
   _id: ObjectId;
   name: string;
