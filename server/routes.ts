@@ -14,7 +14,7 @@ const getAllFlash = async (ctx: RouterContext) => {
 const createFlash = async (ctx: RouterContext) => {
   const { name, imgUrl, isRepeatable, description, size, price, isAvailable } =
     await ctx.request.body().value;
-  const flash: Flash = {
+  const flash = Flash.parse({
     name,
     imgUrl,
     isRepeatable,
@@ -22,7 +22,8 @@ const createFlash = async (ctx: RouterContext) => {
     size,
     price,
     isAvailable,
-  };
+  });
+  console.log(`${JSON.stringify(flash, null, 4)}`);
   const id = await flashCollection.insertOne(flash);
   flash._id = id;
   ctx.response.status = 201;
