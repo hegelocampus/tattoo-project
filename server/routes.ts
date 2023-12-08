@@ -1,4 +1,4 @@
-import { Router } from "https://deno.land/x/oak/mod.ts";
+import { Router, Status } from "https://deno.land/x/oak/mod.ts";
 import dbClient from "./mongodb.ts";
 import { Flash } from "./datatypes.ts";
 
@@ -14,7 +14,7 @@ const getAllFlash = async (ctx: RouterContext) => {
 const createFlash = async (ctx: RouterContext) => {
   const { name, imgUrl, isRepeatable, description, size, price, isAvailable } =
     await ctx.request.body().value;
-  const flash = Flash.parse({
+  const parseResult = await Flash.safeParseAsync({
     name,
     imgUrl,
     isRepeatable,
@@ -23,6 +23,14 @@ const createFlash = async (ctx: RouterContext) => {
     price,
     isAvailable,
   });
+  ctx.assert(
+    parseResult.success,
+    Status.NotAcceptable,
+    //JSON.stringify(parseResult.error.format())
+    JSON.stringify(parseResult.error)
+  );
+  const flash = parseResult.data;
+
   console.log(`${JSON.stringify(flash, null, 4)}`);
   const id = await flashCollection.insertOne(flash);
   flash._id = id;

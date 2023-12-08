@@ -11,4 +11,4 @@ export const Flash = z.object({
   isAvailable: z.boolean(),
 });
 
-export type Flash = z.infer<typeof Flash>;
+export type FlashType = z.infer<typeof Flash>;
