@@ -19,7 +19,7 @@ const getFlash = async (ctx: RouterContext) => {
     });
     ctx.response.body = flash;
     ctx.assert(flash !== null, Status.NotFound, "No entry with that ID found!");
-  } catch (BSONError) {
+  } catch (_e) {
     ctx.response.status = Status.NotFound;
   }
 };
