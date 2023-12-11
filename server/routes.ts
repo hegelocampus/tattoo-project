@@ -18,11 +18,7 @@ const getFlash = async (ctx: RouterContext) => {
       _id: new ObjectId(ctx.params.id),
     });
     ctx.response.body = flash;
-    ctx.assert(
-      flash !== null,
-      Status.NotFound,
-      "No item with that ID found!",
-    );
+    ctx.assert(flash !== null, Status.NotFound, "No entry with that ID found!");
   } catch (BSONError) {
     ctx.response.status = Status.NotFound;
   }
@@ -96,6 +92,7 @@ const updateFlash = async (ctx: RouterContext) => {
   ctx.assert(
     result.matchedCount != 1,
     Status.NotFound,
+    "Could not update! No entry with the given ID was found!",
   );
 
   const flash = parseResult.data;
