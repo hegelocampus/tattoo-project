@@ -1,6 +1,5 @@
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
-
 export const Flash = z.object({
   name: z.string(),
   imgUrl: z.string(),

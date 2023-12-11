@@ -1,5 +1,6 @@
 import { Router, Status } from "https://deno.land/x/oak/mod.ts";
 import dbClient from "./mongodb.ts";
+import { ObjectId } from "npm:mongodb@6.3";
 import { Flash } from "./datatypes.ts";
 
 const router = new Router();
@@ -8,6 +9,13 @@ const flashCollection = dbClient.collection("flash");
 
 const getAllFlash = async (ctx: RouterContext) => {
   const flash: Array<Flash> = await flashCollection.find();
+  ctx.response.body = flash;
+};
+
+const getFlash = async (ctx: RouterContext) => {
+  const flash = await flashCollection.findOne({
+    _id: new ObjectId(ctx.params.id),
+  });
   ctx.response.body = flash;
 };
 
@@ -26,8 +34,7 @@ const createFlash = async (ctx: RouterContext) => {
   ctx.assert(
     parseResult.success,
     Status.NotAcceptable,
-    //JSON.stringify(parseResult.error.format())
-    JSON.stringify(parseResult.error)
+    JSON.stringify(parseResult.error),
   );
   const flash = parseResult.data;
 
@@ -42,8 +49,9 @@ router
   .get("/", (ctx) => {
     ctx.response.boxy = "hello world!";
   })
-  .get("/flash", getAllFlash)
-  .post("/flash", createFlash);
-//.put("/flash/:id", updateFlash);
+  .get("/api/flash", getAllFlash)
+  .get("/api/flash/:id", getFlash)
+  .post("/api/flash", createFlash);
+//.put("/api/flash/:id", updateFlash);
 
 export default router;
