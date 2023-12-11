@@ -13,10 +13,19 @@ const getAllFlash = async (ctx: RouterContext) => {
 };
 
 const getFlash = async (ctx: RouterContext) => {
-  const flash = await flashCollection.findOne({
-    _id: new ObjectId(ctx.params.id),
-  });
-  ctx.response.body = flash;
+  try {
+    const flash = await flashCollection.findOne({
+      _id: new ObjectId(ctx.params.id),
+    });
+    ctx.response.body = flash;
+    ctx.assert(
+      flash !== null,
+      Status.NotFound,
+      "No item with that ID found!",
+    );
+  } catch (BSONError) {
+    ctx.response.status = Status.NotFound;
+  }
 };
 
 const createFlash = async (ctx: RouterContext) => {
@@ -38,10 +47,51 @@ const createFlash = async (ctx: RouterContext) => {
   );
   const flash = parseResult.data;
 
-  console.log(`${JSON.stringify(flash, null, 4)}`);
   const id = await flashCollection.insertOne(flash);
   flash._id = id;
   ctx.response.status = 201;
+  ctx.response.body = flash;
+};
+
+const updateFlash = async (ctx: RouterContext) => {
+  const { name, imgUrl, isRepeatable, description, size, price, isAvailable } =
+    await ctx.request.body().value;
+  // We're building this out into a Flash object to validate it, but we also
+  // use this as our return value.
+  const parseResult = await Flash.safeParseAsync({
+    name,
+    imgUrl,
+    isRepeatable,
+    description,
+    size,
+    price,
+    isAvailable,
+  });
+  ctx.assert(
+    parseResult.success,
+    Status.NotAcceptable,
+    JSON.stringify(parseResult.error),
+  );
+
+  const filter = { _id: new ObjectId(ctx.params.id) };
+  const update = {
+    $set: {
+      name,
+      imgUrl,
+      isRepeatable,
+      description,
+      size,
+      price,
+      isAvailable,
+    },
+  };
+
+  const result = await flashCollection.updateOne(filter, update);
+  console.log(result);
+
+  const flash = parseResult.data;
+  flash._id = ctx.params.id;
+  ctx.response.status = 200;
   ctx.response.body = flash;
 };
 
@@ -51,7 +101,7 @@ router
   })
   .get("/api/flash", getAllFlash)
   .get("/api/flash/:id", getFlash)
-  .post("/api/flash", createFlash);
-//.put("/api/flash/:id", updateFlash);
+  .post("/api/flash", createFlash)
+  .put("/api/flash/:id", updateFlash);
 
 export default router;
