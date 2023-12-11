@@ -53,6 +53,8 @@ const createFlash = async (ctx: RouterContext) => {
   ctx.response.body = flash;
 };
 
+// TODO: We probably wan to set this up to take the current user to do some
+// sort of auth check to make sure they're allowed to update this flash.
 const updateFlash = async (ctx: RouterContext) => {
   const { name, imgUrl, isRepeatable, description, size, price, isAvailable } =
     await ctx.request.body().value;
@@ -88,6 +90,13 @@ const updateFlash = async (ctx: RouterContext) => {
 
   const result = await flashCollection.updateOne(filter, update);
   console.log(result);
+
+  // This should never happen, but if someone tries to update something that
+  // doesn't exist, don't let them
+  ctx.assert(
+    result.matchedCount != 1,
+    Status.NotFound,
+  );
 
   const flash = parseResult.data;
   flash._id = ctx.params.id;
