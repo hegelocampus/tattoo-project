@@ -20,6 +20,7 @@ const getFlash = async (ctx: RouterContext) => {
     ctx.response.body = flash;
     ctx.assert(flash !== null, Status.NotFound, "No entry with that ID found!");
   } catch (_e) {
+    // This handles errors that result from an invalid id that result in a runtime error during parsing.
     ctx.response.status = Status.NotFound;
   }
 };
@@ -87,10 +88,9 @@ const updateFlash = async (ctx: RouterContext) => {
   const result = await flashCollection.updateOne(filter, update);
   console.log(result);
 
-  // This should never happen, but if someone tries to update something that
-  // doesn't exist, don't let them
+  // This should never happen, someone is likely trying to deleted something that has already been deleted.
   ctx.assert(
-    result.matchedCount != 1,
+    result.matchedCount === 1,
     Status.NotFound,
     "Could not update! No entry with the given ID was found!",
   );
@@ -101,6 +101,28 @@ const updateFlash = async (ctx: RouterContext) => {
   ctx.response.body = flash;
 };
 
+// TODO: auth check
+const deleteFlash = async (ctx: RouterContext) => {
+  const filter = { _id: new ObjectId(ctx.params.id) };
+  const result = await flashCollection.deleteOne(filter);
+  console.log(result);
+
+  // This should never happen, but if someone tries to update something that
+  // doesn't exist, don't let them
+  ctx.assert(
+    result.deletedCount === 1,
+    Status.NotFound,
+    "Could not update! No entry with the given ID was found!",
+  );
+  console.log(result.deletedCount === 0);
+
+  const flash = result;
+  flash._id = ctx.params.id;
+  ctx.response.status = 200;
+  ctx.response.body = flash;
+};
+
+
 router
   .get("/", (ctx) => {
     ctx.response.boxy = "hello world!";
@@ -108,6 +130,7 @@ router
   .get("/api/flash", getAllFlash)
   .get("/api/flash/:id", getFlash)
   .post("/api/flash", createFlash)
-  .put("/api/flash/:id", updateFlash);
+  .put("/api/flash/:id", updateFlash)
+  .delete("/api/flash/:id", deleteFlash);
 
 export default router;
