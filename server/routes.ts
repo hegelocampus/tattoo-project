@@ -122,7 +122,6 @@ const deleteFlash = async (ctx: RouterContext) => {
   ctx.response.body = flash;
 };
 
-
 router
   .get("/", (ctx) => {
     ctx.response.boxy = "hello world!";
